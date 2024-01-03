@@ -3,8 +3,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(dimmer clj-refactor flycheck-clj-kondo cider clojure-mode yaml-mode web-mode lsp-ui lsp-mode json-mode js2-mode rainbow-mode elisp-slime-nav rainbow-delimiters company consult orderless vertico exec-path-from-shell zop-to-char zenburn-theme which-key volatile-highlights undo-tree super-save smartrep smartparens operate-on-number nlinum move-text magit projectile imenu-anywhere hl-todo guru-mode git-modes git-timemachine gist flycheck expand-region epl editorconfig easy-kill diminish diff-hl discover-my-major crux browse-kill-ring anzu ag ace-window use-package)))
+  '(package-selected-packages
+   '(dockerfile-mode treemacs dimmer flycheck-clj-kondo cider clojure-mode yaml-mode web-mode lsp-ui lsp-mode json-mode js2-mode rainbow-mode elisp-slime-nav rainbow-delimiters company consult orderless vertico exec-path-from-shell zop-to-char zenburn-theme which-key volatile-highlights undo-tree super-save smartrep smartparens operate-on-number nlinum move-text magit projectile imenu-anywhere hl-todo guru-mode git-modes git-timemachine gist flycheck expand-region epl editorconfig easy-kill diminish diff-hl discover-my-major crux browse-kill-ring anzu ag ace-window use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -15,19 +15,15 @@
 
 (require 'flycheck-clj-kondo)
 
-(eval-after-load 'cider
-  '(add-hook 'before-save-hook 'cider-format-buffer t t))
+(defun my-cider-format-before-save ()
+  "Format the current Clojure buffer using `cider-format-buffer'."
+  (when (or (eq major-mode 'clojure-mode)
+            (eq major-mode 'clojurescript-mode))
+    (cider-format-buffer)))
 
-(defun my-clojure-mode-hook ()
-  (clj-refactor-mode 1)
-  (yas-minor-mode 1) ; for adding require/use/import statements
-  ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-  (cljr-add-keybindings-with-prefix "C-c C-m"))
+(add-hook 'before-save-hook 'my-cider-format-before-save)
 
-(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
-(add-hook 'clojurescript-mode-hook #'my-clojure-mode-hook)
-
-(global-display-line-numbers-mode 1)
+'(global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
 
 ;; Custom smartparens stuff
@@ -39,3 +35,28 @@
 (dimmer-configure-which-key)
 (dimmer-configure-helm)
 (dimmer-mode t)
+
+;; Cider
+(require 'cider)
+;_(setq cider-shadow-cljs-parameters "-A:dev watch hakuvelho-v2")
+(setq cider-shadow-cljs-global-options "-A:dev")
+
+;; Flycheck
+(setq flycheck-display-errors-delay 0.5)
+
+;; Undo-tree
+(setq undo-tree-enable-undo-in-region t)
+
+
+;; clojure-lsp!
+
+(add-hook 'clojure-mode-hook 'lsp)
+(add-hook 'clojurescript-mode-hook 'lsp)
+(add-hook 'clojurec-mode-hook 'lsp)
+(setq company-minimum-prefix-length 1)
+(setq lsp-enable-completion-at-point t)
+
+(define-key lsp-ui-mode-map [remap xref-find-definitions] nil)
+(define-key lsp-ui-mode-map [remap xref-find-references] nil)
+
+(setq cider-eldoc-display-for-symbol-at-point nil) ; disable cider showing eldoc during symbol at point
