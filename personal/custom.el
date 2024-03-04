@@ -4,7 +4,18 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(dockerfile-mode treemacs dimmer flycheck-clj-kondo cider clojure-mode yaml-mode web-mode lsp-ui lsp-mode json-mode js2-mode rainbow-mode elisp-slime-nav rainbow-delimiters company consult orderless vertico exec-path-from-shell zop-to-char zenburn-theme which-key volatile-highlights undo-tree super-save smartrep smartparens operate-on-number nlinum move-text magit projectile imenu-anywhere hl-todo guru-mode git-modes git-timemachine gist flycheck expand-region epl editorconfig easy-kill diminish diff-hl discover-my-major crux browse-kill-ring anzu ag ace-window use-package))
+   '(ace-window ag anzu browse-kill-ring cider clojure-mode company
+                consult crux diff-hl diminish dimmer discover-my-major
+                dockerfile-mode easy-kill editorconfig elisp-slime-nav
+                epl exec-path-from-shell expand-region
+                flycheck flycheck-clj-kondo gist git-modes
+                git-timemachine guru-mode helm hl-todo imenu-anywhere
+                js2-mode json-mode lsp-mode lsp-ui magit move-text
+                nlinum operate-on-number orderless projectile
+                rainbow-delimiters rainbow-mode smartparens smartrep
+                super-save treemacs undo-tree use-package vertico
+                volatile-highlights web-mode which-key yaml-mode
+                zenburn-theme zop-to-char))
  '(safe-local-variable-values '((cider-shadow-cljs-default-options . "app"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -17,8 +28,9 @@
 (require 'flycheck-clj-kondo)
 
 (defun my-lsp-format-before-save ()
-  "Format the current Clojure buffer using `lsp-format-buffer'."
-  (lsp-format-buffer))
+  (lsp-format-buffer)
+  ;(elixir-format)
+  )
 
 (add-hook 'before-save-hook 'my-lsp-format-before-save)
 
@@ -37,7 +49,6 @@
 
 ;; Cider
 (require 'cider)
-;_(setq cider-shadow-cljs-parameters "-A:dev watch hakuvelho-v2")
 (setq cider-shadow-cljs-global-options "-A:dev")
 
 ;; Flycheck
@@ -68,3 +79,22 @@
 (global-set-key (kbd "M-g f") 'avy-goto-line)
 
 (display-time-mode 1)
+
+;; Require 'elixir-ts-mode
+(require 'elixir-ts-mode)
+
+;; Associate .ex and .exs files with elixir-ts-mode
+(add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-ts-mode))
+
+(use-package lsp-mode
+  :commands lsp
+  :ensure t
+  :diminish lsp-mode
+  :hook
+  (elixir-ts-mode . lsp)
+  :init
+  (add-to-list 'exec-path "/Users/kontijuh/Downloads/elixir-ls-v0.19.0"))
+
+;; snippets
+(yas-global-mode 1)
